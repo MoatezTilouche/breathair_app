@@ -1,18 +1,17 @@
-import 'package:breathair_app/pages/sexeForm.dart';
+import 'package:breathair_app/pages/forms/birthForm.dart';
 import 'package:breathair_app/pages/speechBubble.dart';
 import 'package:flutter/material.dart';
 
-class NameForm extends StatefulWidget {
-  const NameForm({super.key});
+class SexeForm extends StatefulWidget {
+  const SexeForm({super.key});
 
   @override
-  State<NameForm> createState() => _NameFormState();
+  State<SexeForm> createState() => _SexeFormState();
 }
 
-class _NameFormState extends State<NameForm> {
-  final TextEditingController _nameController = TextEditingController();
+class _SexeFormState extends State<SexeForm> {
+  String _selectedGender = ''; 
   bool _isLoading = false;
-  bool _isFieldSelected = false;
 
   @override
   Widget build(BuildContext context) {
@@ -28,9 +27,8 @@ class _NameFormState extends State<NameForm> {
               fit: BoxFit.cover,
             ),
           ),
-          // Main content
           Padding(
-            padding: const EdgeInsets.fromLTRB(5, 70, 0, 5),
+            padding: const EdgeInsets.fromLTRB(20, 70, 20, 0),
             child: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -46,9 +44,9 @@ class _NameFormState extends State<NameForm> {
                       CustomPaint(
                         painter: SpeechBubblePainter(),
                         child: Container(
-                          padding: EdgeInsets.all(20),
+                          padding: const EdgeInsets.all(20),
                           child: const Text(
-                            "What should we call you ? ",
+                            "You identify yourself as:",
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -60,49 +58,32 @@ class _NameFormState extends State<NameForm> {
                       ),
                     ],
                   ),
-                  SizedBox(height: 50),
+                  const SizedBox(height: 50),
+
+                  // Gender selection options styled like input fields
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: TextField(
-                      controller: _nameController,
-                      keyboardType: TextInputType.text,
-                      onTap: () {
-                        setState(() {
-                          _isFieldSelected = true;
-                        });
-                      },
-                      decoration: InputDecoration(
-                        labelText: 'Enter Your name',
-                        labelStyle: TextStyle(
-                          color: _isFieldSelected ? Colors.green : Colors.grey,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(
-                            color:
-                                const Color(0xFF399918), 
-                          ),
-                        ),
-                        filled: true,
-                        fillColor: Colors.white,
-                      ),
+                    child: Column(
+                      children: [
+                        _buildGenderOption("Male"),
+                        const SizedBox(height: 10),
+                        _buildGenderOption("Female"),
+                        const SizedBox(height: 10),
+                        _buildGenderOption("Other"),
+                      ],
                     ),
                   ),
-                  SizedBox(height: 70),
+
+                  const SizedBox(height: 70),
+
+                 
                   ElevatedButton(
                     onPressed: () {
-                      FocusScope.of(context).unfocus();
-
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const SexeForm()));
+                      if (_selectedGender.isNotEmpty) {
+                        print("Selected gender: $_selectedGender");
+                      }
+                      Navigator.push(context, 
+                      MaterialPageRoute(builder: (context)=> const YearOfBirthForm()   ));
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF399918),
@@ -120,7 +101,7 @@ class _NameFormState extends State<NameForm> {
                             'Continue',
                             style: TextStyle(
                               color: Colors.white,
-                              fontSize: 17,
+                              fontSize: 15,
                             ),
                           ),
                   ),
@@ -129,6 +110,41 @@ class _NameFormState extends State<NameForm> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildGenderOption(String gender) {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _selectedGender = gender;
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: _selectedGender == gender
+                ? const Color(0xFF399918) 
+                : Colors.grey, 
+            width: 2,
+          ),
+        ),
+        child: Center(
+          child: Text(
+            gender,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: _selectedGender == gender
+                  ? const Color(0xFF399918) 
+                  : Colors.black, 
+            ),
+          ),
+        ),
       ),
     );
   }

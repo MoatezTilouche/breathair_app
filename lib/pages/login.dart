@@ -1,7 +1,7 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
 import 'package:breathair_app/pages/form.dart';
-import 'package:breathair_app/pages/nameForm.dart';
+import 'package:breathair_app/pages/forms/nameForm.dart';
 import 'package:flutter/material.dart';
 
 class Login extends StatefulWidget {

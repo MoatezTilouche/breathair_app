@@ -1,17 +1,38 @@
-import 'package:breathair_app/pages/birthForm.dart';
 import 'package:breathair_app/pages/speechBubble.dart';
 import 'package:flutter/material.dart';
 
-class RaisonForm extends StatefulWidget {
-  const RaisonForm({super.key});
+class PriceOfCigaretteForm extends StatefulWidget {
+  const PriceOfCigaretteForm({super.key});
 
   @override
-  State<RaisonForm> createState() => _RaisonFormState();
+  State<PriceOfCigaretteForm> createState() => _PriceOfCigaretteFormState();
 }
 
-class _RaisonFormState extends State<RaisonForm> {
-  String _selectedReason = '';
+class _PriceOfCigaretteFormState extends State<PriceOfCigaretteForm> {
+  final TextEditingController _priceController = TextEditingController();
   bool _isLoading = false;
+  bool _isFieldSelected = false;
+
+  final FocusNode _focusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Listening to the focus changes to update the border and label color
+    _focusNode.addListener(() {
+      setState(() {
+        _isFieldSelected = _focusNode.hasFocus;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    _priceController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +49,7 @@ class _RaisonFormState extends State<RaisonForm> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 70, 20, 0),
+            padding: const EdgeInsets.fromLTRB(5, 70, 0, 5),
             child: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -47,14 +68,14 @@ class _RaisonFormState extends State<RaisonForm> {
                           child: Container(
                             padding: const EdgeInsets.all(20),
                             child: const Text(
-                              "Which of the following is the main reason you want to change?",
+                              "How much does a pack of cigarettes cost in TND?",
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black,
                               ),
                               textAlign: TextAlign.center,
-                              softWrap: true, 
+                              softWrap: true,
                               overflow: TextOverflow.visible,
                             ),
                           ),
@@ -63,32 +84,51 @@ class _RaisonFormState extends State<RaisonForm> {
                     ],
                   ),
                   const SizedBox(height: 50),
+
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: Column(
-                      children: [
-                        _buildReasonOption("My health"),
-                        const SizedBox(height: 10),
-                        _buildReasonOption("My family"),
-                        const SizedBox(height: 10),
-                        _buildReasonOption("Save Money"),
-                        const SizedBox(height: 10),
-                        _buildReasonOption("To be free"),
-                        const SizedBox(height: 10),
-                        _buildReasonOption("To have a child"),
-                      ],
+                    child: TextField(
+                      controller: _priceController,
+                      keyboardType: TextInputType.number,
+                      focusNode: _focusNode, // Attach the FocusNode
+                      decoration: InputDecoration(
+                        labelText: 'Enter price',
+                        labelStyle: TextStyle(
+                          color: _isFieldSelected ? Colors.green : Colors.grey,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w400,
+                        ),
+                        suffix: const Text(
+                          'TND',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: const BorderSide(
+                            color: Color(0xFF399918),
+                          ),
+                        ),
+                        filled: true,
+                        fillColor: Colors.white,
+                      ),
                     ),
                   ),
+
                   const SizedBox(height: 70),
+
                   ElevatedButton(
                     onPressed: () {
-                      if (_selectedReason.isNotEmpty) {
-                        print("Selected Reason: $_selectedReason");
+                      FocusScope.of(context).unfocus(); // Close the keyboard
+                      if (_priceController.text.isNotEmpty) {
+                        print("Entered Price: ${_priceController.text} TND");
                       }
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const YearOfBirthForm()));
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF399918),
@@ -115,41 +155,6 @@ class _RaisonFormState extends State<RaisonForm> {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildReasonOption(String reason) {
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _selectedReason = reason;
-        });
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: _selectedReason == reason
-                ? const Color(0xFF399918)
-                : Colors.grey,
-            width: 2,
-          ),
-        ),
-        child: Center(
-          child: Text(
-            reason,
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: _selectedReason == reason
-                  ? const Color(0xFF399918)
-                  : Colors.black,
-            ),
-          ),
-        ),
       ),
     );
   }

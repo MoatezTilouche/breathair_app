@@ -1,16 +1,17 @@
-import 'package:breathair_app/pages/raisonForm.dart';
+import 'package:breathair_app/pages/forms/priceCigaretteForm.dart';
+import 'package:breathair_app/pages/forms/raisonForm.dart';
 import 'package:breathair_app/pages/speechBubble.dart';
 import 'package:flutter/material.dart';
 
-class YearOfBirthForm extends StatefulWidget {
-  const YearOfBirthForm({super.key});
+class NumberCigarettesForm extends StatefulWidget {
+  const NumberCigarettesForm ({super.key});
 
   @override
-  State<YearOfBirthForm> createState() => _YearOfBirthFormState();
+  State<NumberCigarettesForm > createState() => _NumberCigarettesForm();
 }
 
-class _YearOfBirthFormState extends State<YearOfBirthForm> {
-  final TextEditingController _yearController = TextEditingController();
+class _NumberCigarettesForm  extends State<NumberCigarettesForm > {
+  final TextEditingController _nbCigarettesController = TextEditingController();
   bool _isFieldSelected = false;
   bool _isLoading = false;
 
@@ -51,13 +52,15 @@ class _YearOfBirthFormState extends State<YearOfBirthForm> {
                           child: Container(
                             padding: EdgeInsets.all(20),
                             child: const Text(
-                              "What's your year of birth?",
+                              "How many cigarettes per day?",
                               style: TextStyle(
-                                fontSize: 16,
+                                fontSize: 14,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black,
                               ),
-                              textAlign: TextAlign.center,
+                               textAlign: TextAlign.center,
+                              softWrap: true, 
+                              overflow: TextOverflow.visible,
                             ),
                           ),
                         ),
@@ -68,7 +71,7 @@ class _YearOfBirthFormState extends State<YearOfBirthForm> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 10),
                       child: TextField(
-                        controller: _yearController,
+                        controller:  _nbCigarettesController,
                         keyboardType: TextInputType.number,
                         onTap: () {
                           setState(() {
@@ -76,7 +79,7 @@ class _YearOfBirthFormState extends State<YearOfBirthForm> {
                           });
                         },
                         decoration: InputDecoration(
-                          labelText: 'Enter your year of birth',
+                          labelText: 'Enter average number',
                           labelStyle: TextStyle(
                             color: _isFieldSelected ? Colors.green : Colors.grey,
                             fontSize: 20,
@@ -104,12 +107,12 @@ class _YearOfBirthFormState extends State<YearOfBirthForm> {
                         setState(() {
                           _isLoading = true;
                         });
-                        Navigator.push(context, MaterialPageRoute(builder: (context)=>const RaisonForm()));
+                        Navigator.push(context, MaterialPageRoute(builder: (context)=>const PriceOfCigaretteForm()));
                         Future.delayed(Duration(seconds: 2), () {
                           setState(() {
                             _isLoading = false;
                           });
-                          print("Selected year of birth: ${_yearController.text}");
+                          print("Number of cigarettes: ${ _nbCigarettesController.text}");
                         });
                       },
                       style: ElevatedButton.styleFrom(
