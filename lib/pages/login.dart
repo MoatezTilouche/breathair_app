@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
 import 'package:breathair_app/pages/form.dart';
+import 'package:breathair_app/pages/nameForm.dart';
 import 'package:flutter/material.dart';
 
 class Login extends StatefulWidget {
@@ -50,8 +51,11 @@ class _LoginState extends State<Login> {
                   const Forrm(),
                   const SizedBox(height: 15),
                   const Text("OR LOG IN WITH",
-                      style: TextStyle(fontSize: 14.0, color: Colors.black,fontWeight: FontWeight.bold)),
-                       const SizedBox(height: 15),
+                      style: TextStyle(
+                          fontSize: 14.0,
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 15),
                   Padding(
                     padding: const EdgeInsets.all(2.0),
                     child: Center(
@@ -64,19 +68,37 @@ class _LoginState extends State<Login> {
                             size: 30,
                           ),
                           const SizedBox(width: 10),
-                          Icon(Icons.apple, size: 30,),
+                          Icon(
+                            Icons.apple,
+                            size: 30,
+                          ),
                           const SizedBox(width: 10),
-                          Icon(Icons.snapchat_rounded, size: 30,)
+                          Icon(
+                            Icons.snapchat_rounded,
+                            size: 30,
+                          )
                         ],
                       ),
                     ),
                   ),
                   const SizedBox(
-                    height:90,
+                    height: 90,
                   ),
-                  const Text("Don't have account? Sign Up",
+                  GestureDetector(
+                    onTap: () async {
+                       Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>  NameForm()));
+                    },
+                    child: const Text(
+                      "Don't have account? Sign Up",
                       style: TextStyle(
-                          fontSize: 14.0, color: const Color(0xFF399918))),
+                        color: const Color(0xFF399918),
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),

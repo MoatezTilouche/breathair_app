@@ -1,13 +1,12 @@
 import 'package:breathair_app/pages/login.dart';
-import 'package:breathair_app/pages/welcome2.dart';
 import 'package:flutter/material.dart';
 
-class Welcome extends StatefulWidget {
+class Welcome2 extends StatefulWidget {
   @override
   _WelcomeState createState() => _WelcomeState();
 }
 
-class _WelcomeState extends State<Welcome> {
+class _WelcomeState extends State<Welcome2> {
   bool _isLoading = false;
 
   @override
@@ -48,7 +47,7 @@ class _WelcomeState extends State<Welcome> {
                   const Column(
                     children: [
                       Text(
-                        "Congratulations!",
+                        "What's Breath Air App?",
                         style: TextStyle(
                           fontSize: 24,
                           color: Colors.white,
@@ -57,7 +56,7 @@ class _WelcomeState extends State<Welcome> {
                       ),
                       SizedBox(height: 10),
                       Text(
-                        "Quitting smoking is the best way to change your life for the better!",
+                        "Breath air is an application mobile to help smokers quit smoking throw challenges and a healthy path.",
                         style: TextStyle(
                           fontSize: 16,
                           color: Colors.white,
@@ -77,7 +76,7 @@ class _WelcomeState extends State<Welcome> {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => Welcome2()));
+                                    builder: (context) => const Login()));
                             // Simulate a delay for loading state
                             Future.delayed(const Duration(seconds: 2), () {
                               setState(() {
