@@ -77,7 +77,7 @@ class _NameFormState extends State<NameForm> {
                           color: _isFieldSelected ? Colors.green : Colors.grey,
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          
+
                         ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -86,7 +86,7 @@ class _NameFormState extends State<NameForm> {
                           borderRadius: BorderRadius.circular(10),
                           borderSide: BorderSide(
                             color:
-                                const Color(0xFF399918), 
+                                const Color(0xFF399918),
                           ),
                         ),
                         filled: true,
@@ -133,3 +133,5 @@ class _NameFormState extends State<NameForm> {
     );
   }
 }
+
+

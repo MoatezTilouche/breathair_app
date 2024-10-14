@@ -1,4 +1,3 @@
-import 'package:breathair_app/pages/ForgetPassword.dart';
 import 'package:flutter/material.dart';
 
 class Forrm extends StatefulWidget {
@@ -39,12 +38,12 @@ class _ForrmState extends State<Forrm> {
                     decoration: InputDecoration(
                       filled: true,
                       fillColor: Colors.white,
-                      labelText: "Email address",
+                      labelText: "Key",
                       labelStyle: const TextStyle(
                           color: Color(0xFF638889),
                           fontSize: 12,
                           fontWeight: FontWeight.w400),
-                      hintText: "Enter your email",
+                      hintText: "Enter your Key",
                       hintStyle: const TextStyle(
                           color: Color(0xFF638889), fontSize: 12),
                       enabledBorder: OutlineInputBorder(
@@ -70,7 +69,7 @@ class _ForrmState extends State<Forrm> {
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'You must fill your email';
+                        return 'You must fill your Key';
                       }
                       return null;
                     },
@@ -85,12 +84,12 @@ class _ForrmState extends State<Forrm> {
                     decoration: InputDecoration(
                       filled: true,
                       fillColor: Colors.white,
-                      labelText: "Password",
+                      labelText: "New Password",
                       labelStyle: const TextStyle(
                           color: Color(0xFF638889),
                           fontSize: 12,
                           fontWeight: FontWeight.w400),
-                      hintText: "Enter your password",
+                      hintText: "Enter your new password",
                       hintStyle: const TextStyle(
                           color: Color(0xFF638889), fontSize: 12),
                       enabledBorder: OutlineInputBorder(
@@ -129,7 +128,65 @@ class _ForrmState extends State<Forrm> {
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'You must fill your password';
+                        return 'You must fill your new password';
+                      }
+                      return null;
+                    },
+                    onSaved: (value) {
+                      _password = value!;
+                    },
+                  ),
+                  TextFormField(
+                    controller: _passwordController,
+                    obscureText: _obscureText,
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.white,
+                      labelText: "Confirm Password",
+                      labelStyle: const TextStyle(
+                          color: Color(0xFF638889),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w400),
+                      hintText: "Enter your new password",
+                      hintStyle: const TextStyle(
+                          color: Color(0xFF638889), fontSize: 12),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: const Color(0xFFEBF4F6)),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(color: const Color(0xFFEBF4F6)),
+                      ),
+                      errorBorder: OutlineInputBorder(
+                        borderSide: const BorderSide(color: Colors.red),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      focusedErrorBorder: OutlineInputBorder(
+                        borderSide: const BorderSide(color: Colors.red),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      prefixIcon:
+                          const Icon(Icons.lock, color: Color(0xFF00712D)),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscureText
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                          color: Colors.grey,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _obscureText = !_obscureText;
+                          });
+                        },
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                          vertical: 15, horizontal: 48),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'You must fill your new password';
                       }
                       return null;
                     },
@@ -153,7 +210,7 @@ class _ForrmState extends State<Forrm> {
                                 AlwaysStoppedAnimation<Color>(Colors.white),
                           )
                         : const Text(
-                            'Login',
+                            'Reset password',
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 15,
@@ -161,21 +218,6 @@ class _ForrmState extends State<Forrm> {
                           ),
                   ),
                   const SizedBox(height: 10),
-                  GestureDetector(
-                    onTap: () async {
-                    Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const ForgetPass()));
-                    },
-                    child: const Text(
-                      'Forgot your password?',
-                      style: TextStyle(
-                        color: const Color(0xFF399918),
-                        decoration: TextDecoration.underline,
-                      ),
-                    ),
-                  ),
                 ],
               ),
             ),
@@ -185,5 +227,3 @@ class _ForrmState extends State<Forrm> {
     );
   }
 }
-
-

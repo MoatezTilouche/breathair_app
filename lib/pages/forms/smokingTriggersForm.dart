@@ -1,3 +1,4 @@
+import 'package:breathair_app/pages/forms/numberCigarettesForm.dart';
 import 'package:breathair_app/pages/speechBubble.dart';
 import 'package:flutter/material.dart';
 
@@ -64,25 +65,24 @@ class _SmokingTriggersFormState extends State<SmokingTriggersForm> {
                         child: CustomPaint(
                           painter: SpeechBubblePainter(),
                           child: Container(
-                              padding: const EdgeInsets.all(20),
-                              child: const Text(
-                                "Which of the following are the main triggers of smoking?",
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
-                                ),
-                                textAlign: TextAlign.center,
-                                softWrap: true, 
-                                overflow: TextOverflow.visible,
+                            padding: const EdgeInsets.all(20),
+                            child: const Text(
+                              "Which of the following are the main triggers of smoking?",
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
                               ),
+                              textAlign: TextAlign.center,
+                              softWrap: true,
+                              overflow: TextOverflow.visible,
                             ),
+                          ),
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 30),
-                  
                   Wrap(
                     spacing: 10,
                     runSpacing: 10,
@@ -90,12 +90,16 @@ class _SmokingTriggersFormState extends State<SmokingTriggersForm> {
                         .map((trigger) => _buildTriggerOption(trigger, context))
                         .toList(),
                   ),
-
                   const SizedBox(height: 80),
                   ElevatedButton(
-                    onPressed: (_selectedTriggers.length >= 1 && _selectedTriggers.length <= 3)
+                    onPressed: (_selectedTriggers.length >= 1 &&
+                            _selectedTriggers.length <= 3)
                         ? () {
                             print("Selected Triggers: $_selectedTriggers");
+                         Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const NumberCigarettesForm()));
                           }
                         : null,
                     style: ElevatedButton.styleFrom(
@@ -118,7 +122,6 @@ class _SmokingTriggersFormState extends State<SmokingTriggersForm> {
                             ),
                           ),
                   ),
-                
                 ],
               ),
             ),
@@ -131,7 +134,8 @@ class _SmokingTriggersFormState extends State<SmokingTriggersForm> {
   // Build each selectable trigger option with a fixed width for 2 items per line
   Widget _buildTriggerOption(String trigger, BuildContext context) {
     bool isSelected = _selectedTriggers.contains(trigger);
-    double width = MediaQuery.of(context).size.width * 0.45; // Ensuring two items per line
+    double width =
+        MediaQuery.of(context).size.width * 0.45; // Ensuring two items per line
 
     return GestureDetector(
       onTap: () {

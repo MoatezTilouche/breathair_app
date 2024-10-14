@@ -1,3 +1,4 @@
+import 'package:breathair_app/pages/forms/Start.dart';
 import 'package:breathair_app/pages/speechBubble.dart';
 import 'package:flutter/material.dart';
 
@@ -84,7 +85,6 @@ class _PriceOfCigaretteFormState extends State<PriceOfCigaretteForm> {
                     ],
                   ),
                   const SizedBox(height: 50),
-
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 10),
                     child: TextField(
@@ -120,14 +120,16 @@ class _PriceOfCigaretteFormState extends State<PriceOfCigaretteForm> {
                       ),
                     ),
                   ),
-
                   const SizedBox(height: 70),
-
                   ElevatedButton(
                     onPressed: () {
                       FocusScope.of(context).unfocus(); // Close the keyboard
                       if (_priceController.text.isNotEmpty) {
                         print("Entered Price: ${_priceController.text} TND");
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const Start()));
                       }
                     },
                     style: ElevatedButton.styleFrom(

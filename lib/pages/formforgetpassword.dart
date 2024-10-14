@@ -1,4 +1,4 @@
-import 'package:breathair_app/pages/ForgetPassword.dart';
+import 'package:breathair_app/pages/ForgetPassword2.dart';
 import 'package:flutter/material.dart';
 
 class Forrm extends StatefulWidget {
@@ -79,67 +79,14 @@ class _ForrmState extends State<Forrm> {
                     },
                   ),
                   const SizedBox(height: 15),
-                  TextFormField(
-                    controller: _passwordController,
-                    obscureText: _obscureText,
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.white,
-                      labelText: "Password",
-                      labelStyle: const TextStyle(
-                          color: Color(0xFF638889),
-                          fontSize: 12,
-                          fontWeight: FontWeight.w400),
-                      hintText: "Enter your password",
-                      hintStyle: const TextStyle(
-                          color: Color(0xFF638889), fontSize: 12),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: const Color(0xFFEBF4F6)),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide(color: const Color(0xFFEBF4F6)),
-                      ),
-                      errorBorder: OutlineInputBorder(
-                        borderSide: const BorderSide(color: Colors.red),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      focusedErrorBorder: OutlineInputBorder(
-                        borderSide: const BorderSide(color: Colors.red),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      prefixIcon:
-                          const Icon(Icons.lock, color: Color(0xFF00712D)),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _obscureText
-                              ? Icons.visibility
-                              : Icons.visibility_off,
-                          color: Colors.grey,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            _obscureText = !_obscureText;
-                          });
-                        },
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                          vertical: 15, horizontal: 48),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'You must fill your password';
-                      }
-                      return null;
-                    },
-                    onSaved: (value) {
-                      _password = value!;
-                    },
-                  ),
                   const SizedBox(height: 20),
                   ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const ForgetPass1()));
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF399918),
                       shape: RoundedRectangleBorder(
@@ -153,7 +100,7 @@ class _ForrmState extends State<Forrm> {
                                 AlwaysStoppedAnimation<Color>(Colors.white),
                           )
                         : const Text(
-                            'Login',
+                            'Send Key',
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 15,
@@ -161,21 +108,6 @@ class _ForrmState extends State<Forrm> {
                           ),
                   ),
                   const SizedBox(height: 10),
-                  GestureDetector(
-                    onTap: () async {
-                    Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const ForgetPass()));
-                    },
-                    child: const Text(
-                      'Forgot your password?',
-                      style: TextStyle(
-                        color: const Color(0xFF399918),
-                        decoration: TextDecoration.underline,
-                      ),
-                    ),
-                  ),
                 ],
               ),
             ),
@@ -185,5 +117,3 @@ class _ForrmState extends State<Forrm> {
     );
   }
 }
-
-
