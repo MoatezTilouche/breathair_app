@@ -26,7 +26,7 @@ class _LoginState extends State<Login> {
                 children: [
                   const SizedBox(height: 80),
                   Center(
-                    child: Image.asset('assets/logo2.png', height: 85),
+                    child: Image.asset('assets/logo2.png', height: 185),
                   ),
                   const SizedBox(
                     height: 30,
@@ -86,10 +86,8 @@ class _LoginState extends State<Login> {
                   ),
                   GestureDetector(
                     onTap: () async {
-                       Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>  NameForm()));
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => NameForm()));
                     },
                     child: const Text(
                       "Don't have account? Sign Up",
@@ -108,6 +106,3 @@ class _LoginState extends State<Login> {
     );
   }
 }
-
-
-

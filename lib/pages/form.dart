@@ -1,5 +1,8 @@
 import 'package:breathair_app/pages/ForgetPassword.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class Forrm extends StatefulWidget {
   const Forrm({Key? key}) : super(key: key);
@@ -10,14 +13,11 @@ class Forrm extends StatefulWidget {
 
 class _ForrmState extends State<Forrm> {
   final _formGlobalKey = GlobalKey<FormState>();
-
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
   bool _obscureText = true;
   bool _isLoading = false;
-  String _email = '';
-  String _password = '';
 
   @override
   Widget build(BuildContext context) {
@@ -41,12 +41,15 @@ class _ForrmState extends State<Forrm> {
                       fillColor: Colors.white,
                       labelText: "Email address",
                       labelStyle: const TextStyle(
-                          color: Color(0xFF638889),
-                          fontSize: 12,
-                          fontWeight: FontWeight.w400),
+                        color: Color(0xFF638889),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w400,
+                      ),
                       hintText: "Enter your email",
                       hintStyle: const TextStyle(
-                          color: Color(0xFF638889), fontSize: 12),
+                        color: Color(0xFF638889),
+                        fontSize: 12,
+                      ),
                       enabledBorder: OutlineInputBorder(
                         borderSide: BorderSide(color: const Color(0xFFEBF4F6)),
                         borderRadius: BorderRadius.circular(10),
@@ -74,9 +77,6 @@ class _ForrmState extends State<Forrm> {
                       }
                       return null;
                     },
-                    onSaved: (value) {
-                      _email = value!;
-                    },
                   ),
                   const SizedBox(height: 15),
                   TextFormField(
@@ -87,12 +87,15 @@ class _ForrmState extends State<Forrm> {
                       fillColor: Colors.white,
                       labelText: "Password",
                       labelStyle: const TextStyle(
-                          color: Color(0xFF638889),
-                          fontSize: 12,
-                          fontWeight: FontWeight.w400),
+                        color: Color(0xFF638889),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w400,
+                      ),
                       hintText: "Enter your password",
                       hintStyle: const TextStyle(
-                          color: Color(0xFF638889), fontSize: 12),
+                        color: Color(0xFF638889),
+                        fontSize: 12,
+                      ),
                       enabledBorder: OutlineInputBorder(
                         borderSide: BorderSide(color: const Color(0xFFEBF4F6)),
                         borderRadius: BorderRadius.circular(10),
@@ -133,13 +136,10 @@ class _ForrmState extends State<Forrm> {
                       }
                       return null;
                     },
-                    onSaved: (value) {
-                      _password = value!;
-                    },
                   ),
                   const SizedBox(height: 20),
                   ElevatedButton(
-                    onPressed: () {},
+                    onPressed: _isLoading ? null : _login,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF399918),
                       shape: RoundedRectangleBorder(
@@ -162,8 +162,8 @@ class _ForrmState extends State<Forrm> {
                   ),
                   const SizedBox(height: 10),
                   GestureDetector(
-                    onTap: () async {
-                    Navigator.push(
+                    onTap: () {
+                      Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (context) => const ForgetPass()));
@@ -171,7 +171,7 @@ class _ForrmState extends State<Forrm> {
                     child: const Text(
                       'Forgot your password?',
                       style: TextStyle(
-                        color: const Color(0xFF399918),
+                        color: Color(0xFF399918),
                         decoration: TextDecoration.underline,
                       ),
                     ),
@@ -184,6 +184,75 @@ class _ForrmState extends State<Forrm> {
       ),
     );
   }
+
+  Future<void> _login() async {
+    if (_formGlobalKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true; // Show loading indicator
+      });
+
+      String email = _emailController.text;
+      String password = _passwordController.text;
+
+      try {
+        var response = await loginUser(email, password);
+        if (response['access_token'] != null) {
+          await saveToken(response['access_token']); // Save token
+          // Show success message
+          showSuccessMessage("Login successful!");
+          // Navigate to the next screen (e.g., HomePage)
+          // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomePage()));
+        } else {
+          showErrorMessage("Login failed. Please try again.");
+        }
+      } catch (error) {
+        showErrorMessage("An error occurred. Please try again.");
+      } finally {
+        setState(() {
+          _isLoading = false; // Stop loading indicator
+        });
+      }
+    }
+  }
+
+  Future<void> saveToken(String token) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('access_token', token);
+  }
+
+  Future<Map<String, dynamic>> loginUser(String email, String password) async {
+    final response = await http.post(
+      Uri.parse('http://localhost:3000/auth/login'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        'email': email,
+        'password': password,
+      }),
+    );
+
+    if (response.statusCode == 201) {
+      // Change to 200 for successful login
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Failed to log in');
+    }
+  }
+
+  void showErrorMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
+
+  void showSuccessMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor:
+            Colors.green, // Optional: Set background color for success message
+      ),
+    );
+  }
 }
-
-
