@@ -1,8 +1,7 @@
-import 'package:breathair_app/pages/ForgetPassword.dart';
+import 'package:breathair_app/pages/services/authService.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:breathair_app/pages/ForgetPassword.dart';
+import 'package:breathair_app/pages/home.dart';
 
 class Forrm extends StatefulWidget {
   const Forrm({Key? key}) : super(key: key);
@@ -15,6 +14,7 @@ class _ForrmState extends State<Forrm> {
   final _formGlobalKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final AuthService _authService = AuthService();
 
   bool _obscureText = true;
   bool _isLoading = false;
@@ -33,6 +33,7 @@ class _ForrmState extends State<Forrm> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
+                  // Email TextFormField
                   TextFormField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
@@ -66,10 +67,9 @@ class _ForrmState extends State<Forrm> {
                         borderSide: const BorderSide(color: Colors.red),
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      prefixIcon:
-                          const Icon(Icons.mail, color: Color(0xFF00712D)),
-                      contentPadding: const EdgeInsets.symmetric(
-                          vertical: 15, horizontal: 48),
+                      prefixIcon: const Icon(Icons.mail, color: Color(0xFF00712D)),
+                      contentPadding:
+                          const EdgeInsets.symmetric(vertical: 15, horizontal: 48),
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -79,6 +79,8 @@ class _ForrmState extends State<Forrm> {
                     },
                   ),
                   const SizedBox(height: 15),
+                  
+                  // Password TextFormField
                   TextFormField(
                     controller: _passwordController,
                     obscureText: _obscureText,
@@ -112,13 +114,10 @@ class _ForrmState extends State<Forrm> {
                         borderSide: const BorderSide(color: Colors.red),
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      prefixIcon:
-                          const Icon(Icons.lock, color: Color(0xFF00712D)),
+                      prefixIcon: const Icon(Icons.lock, color: Color(0xFF00712D)),
                       suffixIcon: IconButton(
                         icon: Icon(
-                          _obscureText
-                              ? Icons.visibility
-                              : Icons.visibility_off,
+                          _obscureText ? Icons.visibility : Icons.visibility_off,
                           color: Colors.grey,
                         ),
                         onPressed: () {
@@ -127,8 +126,8 @@ class _ForrmState extends State<Forrm> {
                           });
                         },
                       ),
-                      contentPadding: const EdgeInsets.symmetric(
-                          vertical: 15, horizontal: 48),
+                      contentPadding:
+                          const EdgeInsets.symmetric(vertical: 15, horizontal: 48),
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -138,6 +137,8 @@ class _ForrmState extends State<Forrm> {
                     },
                   ),
                   const SizedBox(height: 20),
+
+                  // Login Button
                   ElevatedButton(
                     onPressed: _isLoading ? null : _login,
                     style: ElevatedButton.styleFrom(
@@ -161,6 +162,8 @@ class _ForrmState extends State<Forrm> {
                           ),
                   ),
                   const SizedBox(height: 10),
+
+                  // Forgot Password
                   GestureDetector(
                     onTap: () {
                       Navigator.push(
@@ -195,13 +198,12 @@ class _ForrmState extends State<Forrm> {
       String password = _passwordController.text;
 
       try {
-        var response = await loginUser(email, password);
+        var response = await _authService.loginUser(email, password);
         if (response['access_token'] != null) {
-          await saveToken(response['access_token']); // Save token
-          // Show success message
+          await _authService.saveToken(response['access_token']); // Save token
           showSuccessMessage("Login successful!");
-          // Navigate to the next screen (e.g., HomePage)
-          // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomePage()));
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => Home()));
         } else {
           showErrorMessage("Login failed. Please try again.");
         }
@@ -212,31 +214,6 @@ class _ForrmState extends State<Forrm> {
           _isLoading = false; // Stop loading indicator
         });
       }
-    }
-  }
-
-  Future<void> saveToken(String token) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('access_token', token);
-  }
-
-  Future<Map<String, dynamic>> loginUser(String email, String password) async {
-    final response = await http.post(
-      Uri.parse('http://localhost:3000/auth/login'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(<String, String>{
-        'email': email,
-        'password': password,
-      }),
-    );
-
-    if (response.statusCode == 201) {
-      // Change to 200 for successful login
-      return jsonDecode(response.body);
-    } else {
-      throw Exception('Failed to log in');
     }
   }
 

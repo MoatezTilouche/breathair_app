@@ -26,7 +26,7 @@ class _LoginState extends State<Login> {
                 children: [
                   const SizedBox(height: 80),
                   Center(
-                    child: Image.asset('assets/logo2.png', height: 185),
+                    child: Image.asset('assets/logo2.png', height: 110),
                   ),
                   const SizedBox(
                     height: 30,

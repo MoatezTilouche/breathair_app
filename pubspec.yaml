@@ -39,6 +39,8 @@ dependencies:
   http: ^1.2.2
   dio: ^5.0.0
   shared_preferences: ^2.0.13
+  flutter_timer_countdown: ^1.0.7
+  fl_chart: ^0.69.0
 
 
 dev_dependencies:

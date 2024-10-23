@@ -1,3 +1,4 @@
+import 'package:breathair_app/pages/home.dart';
 import 'package:flutter/material.dart';
 
 class Start extends StatefulWidget {
@@ -74,6 +75,12 @@ class _StartState extends State<Start> {
                   ElevatedButton(
                     onPressed: () {
                       FocusScope.of(context).unfocus();
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const Home(),
+                        ),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF399918),

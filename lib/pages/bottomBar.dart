@@ -1,8 +1,5 @@
-import 'dart:convert';
-
 import 'package:breathair_app/pages/login.dart';
 import 'package:flutter/material.dart';
-
 
 class DemoBottomAppBar extends StatefulWidget {
   const DemoBottomAppBar({
@@ -24,14 +21,12 @@ class DemoBottomAppBar extends StatefulWidget {
 
 class _DemoBottomAppBarState extends State<DemoBottomAppBar> {
   late int _selectedIndex;
-  String _id = '';
 
   @override
   void initState() {
     super.initState();
     _selectedIndex = widget.selectedIndex;
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -43,38 +38,43 @@ class _DemoBottomAppBarState extends State<DemoBottomAppBar> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: <Widget>[
+            // First Tab
             _buildTabItem(
               index: 0,
               icon: const ImageIcon(AssetImage("assets/home.png")),
               text: 'Home',
               navigateTo: const Login(),
             ),
+            // Spacer to add space between icons
+            const Spacer(),
             _buildTabItem(
               index: 1,
-              icon:const Icon(Icons.sports_gymnastics),
+              icon: const ImageIcon(AssetImage("assets/montagne.png")),
               text: 'Challenge',
-              navigateTo: Login(),
+              navigateTo: const Login(),
             ),
-            const SizedBox(width: 40),
+            const Spacer(),
+            // Third Tab
             _buildTabItem(
               index: 2,
-              icon: const Icon(Icons.book),
+              icon: const ImageIcon(AssetImage("assets/livre.png")),
               text: 'Read',
-              navigateTo:Login(),
+              navigateTo: const Login(),
             ),
+            // Spacer to add space between icons
+            const Spacer(),
             _buildTabItem(
               index: 3,
               icon: const Icon(Icons.people),
-              text: 'Community',
-              navigateTo: const Login(), 
-              onTap: () => widget.scaffoldKey.currentState?.openDrawer(),
+              text: 'Comunity',
+              navigateTo: const Login(),
             ),
+            const Spacer(),
             _buildTabItem(
-              index: 3,
-              icon: const Icon(Icons.person),
+              index: 4,
+              icon: const ImageIcon(AssetImage("assets/user.png")),
               text: 'Profile',
-              navigateTo: const Login(), 
-              onTap: () => widget.scaffoldKey.currentState?.openDrawer(),
+              navigateTo: const Login(),
             ),
           ],
         ),
@@ -90,43 +90,39 @@ class _DemoBottomAppBarState extends State<DemoBottomAppBar> {
     VoidCallback? onTap,
   }) {
     final isSelected = _selectedIndex == index;
-    return Builder(
-      builder: (context) {
-        return GestureDetector(
-          onTap: () {
-            setState(() {
-              _selectedIndex = index;
-            });
-            if (onTap != null) {
-              onTap();
-            } else {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => navigateTo),
-              );
-            }
-          },
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              IconTheme(
-                data: IconThemeData(
-                  color: isSelected ? const Color(0xFF399918) : Colors.grey,
-                ),
-                child: icon,
-              ),
-              const SizedBox(height: 5),
-              Text(
-                text,
-                style: TextStyle(
-                  color: isSelected ?const Color(0xFF399918) : Colors.grey,
-                ),
-              ),
-            ],
-          ),
-        );
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _selectedIndex = index;
+        });
+        if (onTap != null) {
+          onTap();
+        } else {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => navigateTo),
+          );
+        }
       },
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          IconTheme(
+            data: IconThemeData(
+              color: isSelected ? const Color(0xFF399918) : Colors.grey,
+            ),
+            child: icon,
+          ),
+          const SizedBox(height: 5),
+          Text(
+            text,
+            style: TextStyle(
+              color: isSelected ? const Color(0xFF399918) : Colors.grey,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
