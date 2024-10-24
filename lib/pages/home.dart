@@ -44,7 +44,7 @@ class _HomeState extends State<Home> {
 
         setState(() {
           quote = randomQuote['text'];
-          author = randomQuote['sujet']; // Modify if necessary
+          author = randomQuote['sujet'];
         });
       }
     } else {
@@ -54,8 +54,7 @@ class _HomeState extends State<Home> {
 
   Future<void> fetchCigaretteCount() async {
     AuthService authService = AuthService();
-    String? token =
-        await authService.getToken(); // Retrieve token using AuthService
+    String? token = await authService.getToken();
 
     if (token != null) {
       // Fetch user profile to get the email
@@ -70,7 +69,6 @@ class _HomeState extends State<Home> {
         var profileData = json.decode(profileResponse.body);
         String email = profileData['email']; // Get email from profile
 
-        // Now use the email to fetch user details
         final userResponse = await http.get(
           Uri.parse('http://localhost:3000/users/$email'),
           headers: {
@@ -85,7 +83,6 @@ class _HomeState extends State<Home> {
             compteurCig = userData['compteurcig'] ?? 0; // Set cigarette count
           });
 
-          // Now fetch the last challenge using the userId
           final challengeResponse = await http.get(
             Uri.parse('http://localhost:3000/users/$userId/last-challenge'),
             headers: {
@@ -93,7 +90,7 @@ class _HomeState extends State<Home> {
             },
           );
 
-          if (challengeResponse.statusCode == 201) {
+          if (challengeResponse.statusCode == 200) {
             var challengeData = json.decode(challengeResponse.body);
             setState(() {
               timebtwcig = challengeData['timebtwcig'] ?? 60;
@@ -254,7 +251,7 @@ class _HomeState extends State<Home> {
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
-                                  '$compteurCig', // Display the fetched cigarette count
+                                  '$compteurCig',
                                   style: const TextStyle(
                                       fontSize: 25,
                                       fontWeight: FontWeight.bold,
@@ -283,18 +280,26 @@ class _HomeState extends State<Home> {
                                 const Icon(Icons.access_time,
                                     size: 30, color: Colors.white),
                                 const SizedBox(height: 8),
-                                TimerCountdown(
-                                  format: CountDownTimerFormat.hoursMinutes,
-                                  endTime: DateTime.now().add(
-                                    Duration(minutes: timebtwcig),
-                                  ),
-                                  onEnd: () {
-                                    print("Timer finished");
-                                  },
-                                ),
+                                timebtwcig > 0
+                                    ? TimerCountdown(
+                                        format:
+                                            CountDownTimerFormat.hoursMinutes,
+                                        endTime: DateTime.now().add(
+                                          Duration(minutes: timebtwcig),
+                                        ),
+                                        onEnd: () {
+                                          print("Timer finished");
+                                        },
+                                      )
+                                    : const Text(
+                                        'Loading time...',
+                                        style: TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.white70),
+                                      ),
                                 const SizedBox(height: 8),
                                 const Text(
-                                  'Next Cigarette',
+                                  'Next Cigarette ',
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                     fontSize: 12,

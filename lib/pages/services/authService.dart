@@ -1,9 +1,11 @@
 import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
   final String baseUrl = 'http://localhost:3000/auth';
+  final _storage = const FlutterSecureStorage();
 
   // Login function
   Future<Map<String, dynamic>> loginUser(String email, String password) async {
@@ -26,8 +28,11 @@ class AuthService {
       // Display the token in the console
       print('Token: $token');
 
-      // Save the token in SharedPreferences
+      // Save the token securely using FlutterSecureStorage
       await saveToken(token);
+
+      // Save the isAuth flag as true
+      await saveAuthFlag(true);
 
       return data;
     } else {
@@ -35,21 +40,26 @@ class AuthService {
     }
   }
 
-  // Save token in local storage (SharedPreferences)
+  // Save token securely using FlutterSecureStorage
   Future<void> saveToken(String token) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('access_token', token);
+    await _storage.write(key: 'access_token', value: token);
   }
 
-  // Retrieve token from local storage
+  // Retrieve token from secure storage
   Future<String?> getToken() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getString('access_token');
+    return await _storage.read(key: 'access_token');
   }
 
-  // Logout (clear token)
+  // Save isAuth flag in SharedPreferences
+  Future<void> saveAuthFlag(bool isAuth) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isAuth', isAuth);
+  }
+
+  // Logout (clear token and auth flag)
   Future<void> logout() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.remove('access_token');
+    await _storage.delete(key: 'access_token');
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('isAuth');
   }
 }
