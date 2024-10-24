@@ -1,5 +1,8 @@
+
 import 'package:breathair_app/pages/ForgetPassword2.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class Forrm extends StatefulWidget {
   const Forrm({Key? key}) : super(key: key);
@@ -12,12 +15,44 @@ class _ForrmState extends State<Forrm> {
   final _formGlobalKey = GlobalKey<FormState>();
 
   final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
 
-  bool _obscureText = true;
   bool _isLoading = false;
   String _email = '';
-  String _password = '';
+
+  Future<void> _requestPasswordReset(String email) async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    final url = Uri.parse('http://localhost:3000/auth/request-password-reset');
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'email': email}),
+    );
+
+    setState(() {
+      _isLoading = false;
+    });
+
+    if (response.statusCode == 201) {
+      // Navigate to the next page (ForgetPass1) if the email is successfully sent
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const ForgetPass1(),
+        ),
+      );
+    } else {
+      // Show an error message if the request fails
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Failed to send reset key. Please try again.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -82,10 +117,10 @@ class _ForrmState extends State<Forrm> {
                   const SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const ForgetPass1()));
+                      if (_formGlobalKey.currentState?.validate() ?? false) {
+                        // If the form is valid, request password reset
+                        _requestPasswordReset(_emailController.text);
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF399918),

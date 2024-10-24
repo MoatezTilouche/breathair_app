@@ -1,8 +1,14 @@
+import 'dart:convert'; // For json decoding
+import 'dart:math'; // For random selection
 import 'package:breathair_app/pages/appBar.dart';
 import 'package:breathair_app/pages/barchartHome.dart';
 import 'package:breathair_app/pages/bottomBar.dart';
+import 'package:breathair_app/pages/services/authService.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_timer_countdown/flutter_timer_countdown.dart';
+import 'package:intl/intl.dart'; // Add this import for date formatting
+import 'package:http/http.dart' as http; // Add this import for HTTP requests
+import 'package:shared_preferences/shared_preferences.dart'; // Import for SharedPreferences
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -12,14 +18,99 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  String quote =
-      'Take care of your body. It’s the only place you have to live.';
-  String author = 'Jim Rohn';
+  String quote = '';
+  String author = '';
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   // Timer variable
-  int nextCigaretteTime = 30; // Time in minutes until the next cigarette
-  String timerText = 'Next cigarette in 30 min';
+  int timebtwcig = 0; // Time in minutes until the next cigarette
+  int compteurCig = 0; // Variable to store the number of cigarettes
+
+  @override
+  void initState() {
+    super.initState();
+    fetchRandomQuote(); // Fetch quote when the widget is initialized
+    fetchCigaretteCount(); // Fetch cigarette count when the widget is initialized
+  }
+
+  Future<void> fetchRandomQuote() async {
+    final response = await http.get(Uri.parse('http://localhost:3000/quotes'));
+
+    if (response.statusCode == 200) {
+      List quotes = json.decode(response.body);
+      if (quotes.isNotEmpty) {
+        final random = Random();
+        final randomQuote = quotes[random.nextInt(quotes.length)];
+
+        setState(() {
+          quote = randomQuote['text'];
+          author = randomQuote['sujet']; // Modify if necessary
+        });
+      }
+    } else {
+      throw Exception('Failed to load quotes');
+    }
+  }
+
+  Future<void> fetchCigaretteCount() async {
+    AuthService authService = AuthService();
+    String? token =
+        await authService.getToken(); // Retrieve token using AuthService
+
+    if (token != null) {
+      // Fetch user profile to get the email
+      final profileResponse = await http.get(
+        Uri.parse('http://localhost:3000/auth/profile'),
+        headers: {
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (profileResponse.statusCode == 200) {
+        var profileData = json.decode(profileResponse.body);
+        String email = profileData['email']; // Get email from profile
+
+        // Now use the email to fetch user details
+        final userResponse = await http.get(
+          Uri.parse('http://localhost:3000/users/$email'),
+          headers: {
+            'Authorization': 'Bearer $token',
+          },
+        );
+
+        if (userResponse.statusCode == 200) {
+          var userData = json.decode(userResponse.body);
+          String userId = userData['_id']; // Get user ID from user data
+          setState(() {
+            compteurCig = userData['compteurcig'] ?? 0; // Set cigarette count
+          });
+
+          // Now fetch the last challenge using the userId
+          final challengeResponse = await http.get(
+            Uri.parse('http://localhost:3000/users/$userId/last-challenge'),
+            headers: {
+              'Authorization': 'Bearer $token',
+            },
+          );
+
+          if (challengeResponse.statusCode == 201) {
+            var challengeData = json.decode(challengeResponse.body);
+            setState(() {
+              timebtwcig = challengeData['timebtwcig'] ?? 60;
+            });
+          } else {
+            throw Exception('Failed to load last challenge');
+          }
+        } else {
+          throw Exception('Failed to load user data');
+        }
+      } else {
+        throw Exception('Failed to load profile');
+      }
+    } else {
+      throw Exception('Token not found');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +138,8 @@ class _HomeState extends State<Home> {
                         const Icon(Icons.wb_sunny_outlined, color: Colors.grey),
                         const SizedBox(width: 8),
                         Text(
-                          'TUES 11 JUL',
+                          DateFormat('EEE dd MMM').format(
+                              DateTime.now()), // Format the current date
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -91,7 +183,9 @@ class _HomeState extends State<Home> {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            "'Every Failure is a lesson'",
+                            quote.isNotEmpty
+                                ? "'$quote'"
+                                : "Loading quote...", // Display the fetched quote
                             style: const TextStyle(
                                 fontSize: 16,
                                 color: Colors.black,
@@ -104,7 +198,7 @@ class _HomeState extends State<Home> {
                               const Icon(Icons.person, color: Colors.grey),
                               const SizedBox(width: 4),
                               Text(
-                                "Moatez Tilouche",
+                                author,
                                 style: const TextStyle(
                                     fontSize: 16, color: Colors.black54),
                               ),
@@ -159,9 +253,9 @@ class _HomeState extends State<Home> {
                                   ),
                                 ),
                                 const SizedBox(height: 8),
-                                const Text(
-                                  '8',
-                                  style: TextStyle(
+                                Text(
+                                  '$compteurCig', // Display the fetched cigarette count
+                                  style: const TextStyle(
                                       fontSize: 25,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.white),
@@ -192,10 +286,7 @@ class _HomeState extends State<Home> {
                                 TimerCountdown(
                                   format: CountDownTimerFormat.hoursMinutes,
                                   endTime: DateTime.now().add(
-                                    Duration(
-                                      minutes:
-                                          nextCigaretteTime, // Countdown time
-                                    ),
+                                    Duration(minutes: timebtwcig),
                                   ),
                                   onEnd: () {
                                     print("Timer finished");
@@ -203,16 +294,17 @@ class _HomeState extends State<Home> {
                                 ),
                                 const SizedBox(height: 8),
                                 const Text(
-                                  'Next Cigarette Timer',
+                                  'Next Cigarette',
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white),
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
                                 ),
                                 const SizedBox(height: 8),
                                 const Text(
-                                  'Timer updated every minute',
+                                  'Time remaining',
                                   style: TextStyle(
                                       fontSize: 14, color: Colors.white70),
                                 ),
@@ -222,14 +314,14 @@ class _HomeState extends State<Home> {
                         ),
                       ],
                     ),
-                    const SizedBox(
-                        height: 24), // Add some space before the chart
-
-                    // Bar Chart with fixed height
-                    SizedBox(
-                      height: 500, // Set a fixed height for the bar chart
-                      child: CigaretteBarChart(), // Add your bar chart here
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Statistics',
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
+                    const SizedBox(height: 8),
+                    const CigaretteBarChart(), // Ensure this widget is implemented
                   ],
                 ),
               ),

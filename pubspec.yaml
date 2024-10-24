@@ -41,6 +41,8 @@ dependencies:
   shared_preferences: ^2.0.13
   flutter_timer_countdown: ^1.0.7
   fl_chart: ^0.69.0
+  flutter_secure_storage: ^5.0.2
+
 
 
 dev_dependencies:

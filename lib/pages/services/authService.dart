@@ -3,7 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
 class AuthService {
-  final String baseUrl = 'http://192.168.1.22:3000/auth';
+  final String baseUrl = 'http://localhost:3000/auth';
 
   // Login function
   Future<Map<String, dynamic>> loginUser(String email, String password) async {
@@ -20,7 +20,16 @@ class AuthService {
 
     if (response.statusCode == 201 || response.statusCode == 200) {
       // Login successful
-      return jsonDecode(response.body);
+      final data = jsonDecode(response.body);
+      final token = data['access_token'];
+
+      // Display the token in the console
+      print('Token: $token');
+
+      // Save the token in SharedPreferences
+      await saveToken(token);
+
+      return data;
     } else {
       throw Exception('Failed to log in');
     }

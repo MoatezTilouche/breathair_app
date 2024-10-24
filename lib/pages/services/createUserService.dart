@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:breathair_app/globals.dart' as globals;
 
 class UserService {
-  final String baseUrl = 'http://192.168.1.22:3000/users';
+  final String baseUrl = 'http://localhost:3000/users';
 
   // Add user function
   Future<void> addUser() async {
