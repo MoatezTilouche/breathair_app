@@ -36,7 +36,7 @@ class _ForrmState extends State<Forrm> {
     });
 
     if (response.statusCode == 201) {
-      // Navigate to the next page (ForgetPass1) if the email is successfully sent
+      // Navigate to the next page (ForgetPass1)  the email is successfully sent
       Navigator.push(
         context,
         MaterialPageRoute(

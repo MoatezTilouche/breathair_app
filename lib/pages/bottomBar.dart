@@ -1,3 +1,4 @@
+import 'package:breathair_app/pages/blogsPage.dart';
 import 'package:breathair_app/pages/login.dart';
 import 'package:flutter/material.dart';
 
@@ -59,7 +60,7 @@ class _DemoBottomAppBarState extends State<DemoBottomAppBar> {
               index: 2,
               icon: const ImageIcon(AssetImage("assets/livre.png")),
               text: 'Read',
-              navigateTo: const Login(),
+              navigateTo: const Blogspage(),
             ),
             // Spacer to add space between icons
             const Spacer(),

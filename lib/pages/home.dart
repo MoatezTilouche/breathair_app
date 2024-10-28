@@ -1,14 +1,16 @@
-import 'dart:convert'; // For json decoding
-import 'dart:math'; // For random selection
+import 'dart:convert';
+import 'dart:math';
 import 'package:breathair_app/pages/appBar.dart';
 import 'package:breathair_app/pages/barchartHome.dart';
+import 'package:breathair_app/pages/blogCard.dart';
 import 'package:breathair_app/pages/bottomBar.dart';
 import 'package:breathair_app/pages/services/authService.dart';
+import 'package:breathair_app/pages/services/statsService.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_timer_countdown/flutter_timer_countdown.dart';
-import 'package:intl/intl.dart'; // Add this import for date formatting
-import 'package:http/http.dart' as http; // Add this import for HTTP requests
-import 'package:shared_preferences/shared_preferences.dart'; // Import for SharedPreferences
+import 'package:intl/intl.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -18,19 +20,20 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  final CigaretteService _cigaretteService = CigaretteService();
+
   String quote = '';
   String author = '';
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  // Timer variable
-  int timebtwcig = 0; // Time in minutes until the next cigarette
-  int compteurCig = 0; // Variable to store the number of cigarettes
+  int timebtwcig = 0;
+  int compteurCig = 0;
 
   @override
   void initState() {
     super.initState();
-    fetchRandomQuote(); // Fetch quote when the widget is initialized
-    fetchCigaretteCount(); // Fetch cigarette count when the widget is initialized
+    fetchRandomQuote();
+    fetchCigaretteCount();
   }
 
   Future<void> fetchRandomQuote() async {
@@ -53,65 +56,22 @@ class _HomeState extends State<Home> {
   }
 
   Future<void> fetchCigaretteCount() async {
-    AuthService authService = AuthService();
-    String? token = await authService.getToken();
+    try {
+      int fetchedCompteurCig = await _cigaretteService.fetchCigaretteCount();
+      int fetchedTimeBtwCig =
+          await _cigaretteService.fetchTimeBetweenCigarettes();
 
-    if (token != null) {
-      // Fetch user profile to get the email
-      final profileResponse = await http.get(
-        Uri.parse('http://localhost:3000/auth/profile'),
-        headers: {
-          'Authorization': 'Bearer $token',
-        },
-      );
-
-      if (profileResponse.statusCode == 200) {
-        var profileData = json.decode(profileResponse.body);
-        String email = profileData['email']; // Get email from profile
-
-        final userResponse = await http.get(
-          Uri.parse('http://localhost:3000/users/$email'),
-          headers: {
-            'Authorization': 'Bearer $token',
-          },
-        );
-
-        if (userResponse.statusCode == 200) {
-          var userData = json.decode(userResponse.body);
-          String userId = userData['_id']; // Get user ID from user data
-          setState(() {
-            compteurCig = userData['compteurcig'] ?? 0; // Set cigarette count
-          });
-
-          final challengeResponse = await http.get(
-            Uri.parse('http://localhost:3000/users/$userId/last-challenge'),
-            headers: {
-              'Authorization': 'Bearer $token',
-            },
-          );
-
-          if (challengeResponse.statusCode == 200) {
-            var challengeData = json.decode(challengeResponse.body);
-            setState(() {
-              timebtwcig = challengeData['timebtwcig'] ?? 60;
-            });
-          } else {
-            throw Exception('Failed to load last challenge');
-          }
-        } else {
-          throw Exception('Failed to load user data');
-        }
-      } else {
-        throw Exception('Failed to load profile');
-      }
-    } else {
-      throw Exception('Token not found');
+      setState(() {
+        compteurCig = fetchedCompteurCig;
+        timebtwcig = fetchedTimeBtwCig;
+      });
+    } catch (error) {
+      print('Error fetching cigarette data: $error');
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    // Responsive padding
     final padding = MediaQuery.of(context).size.width * 0.04;
 
     return Scaffold(
@@ -123,7 +83,6 @@ class _HomeState extends State<Home> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            // Using Flexible to manage vertical space
             Expanded(
               child: SingleChildScrollView(
                 child: Column(
@@ -135,8 +94,7 @@ class _HomeState extends State<Home> {
                         const Icon(Icons.wb_sunny_outlined, color: Colors.grey),
                         const SizedBox(width: 8),
                         Text(
-                          DateFormat('EEE dd MMM').format(
-                              DateTime.now()), // Format the current date
+                          DateFormat('EEE dd MMM').format(DateTime.now()),
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -180,9 +138,7 @@ class _HomeState extends State<Home> {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            quote.isNotEmpty
-                                ? "'$quote'"
-                                : "Loading quote...", // Display the fetched quote
+                            quote.isNotEmpty ? "'$quote'" : "Loading quote...",
                             style: const TextStyle(
                                 fontSize: 16,
                                 color: Colors.black,
@@ -206,7 +162,6 @@ class _HomeState extends State<Home> {
                     ),
                     const SizedBox(height: 16),
 
-                    // Highlights section
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -221,13 +176,12 @@ class _HomeState extends State<Home> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 26),
 
                     // Highlights cards
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        // Number of Cigarettes Card
                         Expanded(
                           child: Container(
                             padding: const EdgeInsets.all(16),
@@ -284,9 +238,8 @@ class _HomeState extends State<Home> {
                                     ? TimerCountdown(
                                         format:
                                             CountDownTimerFormat.hoursMinutes,
-                                        endTime: DateTime.now().add(
-                                          Duration(minutes: timebtwcig),
-                                        ),
+                                        endTime: DateTime.now()
+                                            .add(Duration(minutes: timebtwcig)),
                                         onEnd: () {
                                           print("Timer finished");
                                         },
@@ -319,14 +272,50 @@ class _HomeState extends State<Home> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 26),
                     const Text(
                       'Statistics',
                       style:
                           TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 8),
-                    const CigaretteBarChart(), // Ensure this widget is implemented
+
+                    // Bar chart with fixed height to avoid overflow
+                    CigaretteBarChart(),
+
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Blogs',
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 8),
+
+                    // Horizontally scrollable BlogCard section
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: [
+                          BlogCard(
+                            category: 'Nutrition',
+                            title:
+                                'Smoking has an effect in harming your lungs',
+                            votes: 78,
+                            imageUrl:
+                                'https://images.unsplash.com/photo-1593974123009-e87a2188ae12?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8c21va2luZyUyMGtpbGxzfGVufDB8fDB8fHww',
+                          ),
+                          const SizedBox(width: 12),
+                          BlogCard(
+                            category: 'Lifestyle',
+                            title:
+                                'The secrets of maximizing your productivity',
+                            votes: 54,
+                            imageUrl:
+                                'https://images.unsplash.com/photo-1566159549726-435f258cf4e7?w=400&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1yZWxhdGVkfDF8fHxlbnwwfHx8fHw%3D',
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
