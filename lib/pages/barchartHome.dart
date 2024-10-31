@@ -1,3 +1,4 @@
+import 'package:breathair_app/pages/services/averageService.dart';
 import 'package:breathair_app/pages/services/chartService.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
@@ -11,12 +12,30 @@ class CigaretteBarChart extends StatefulWidget {
 
 class _CigaretteBarChartState extends State<CigaretteBarChart> {
   late Future<List<Map<String, double>>> _challengeData;
+  int? averageCigarettes; // Variable to hold the average
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _challengeData = ChartService()
-        .fetchChallengeData(); // Fetch data when the widget is initialized
+    _challengeData = ChartService().fetchChallengeData();
+    _fetchAverageCigarettes();
+  }
+
+  Future<void> _fetchAverageCigarettes() async {
+    AverageService averageService = AverageService();
+    try {
+      int average = await averageService.fetchAverage();
+      setState(() {
+        averageCigarettes = average; // Update the average
+        isLoading = false; // Stop loading
+      });
+    } catch (e) {
+      print('Error fetching average: $e');
+      setState(() {
+        isLoading = false; // Stop loading even on error
+      });
+    }
   }
 
   @override
@@ -27,8 +46,8 @@ class _CigaretteBarChartState extends State<CigaretteBarChart> {
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 20),
           child: Column(
-            children: const [
-              Text(
+            children: [
+              const Text(
                 'Your average smoked\ncigarettes per day is',
                 textAlign: TextAlign.center,
                 style: TextStyle(
@@ -37,20 +56,22 @@ class _CigaretteBarChartState extends State<CigaretteBarChart> {
                   color: Colors.black,
                 ),
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    '8',
-                    style: TextStyle(
-                      fontSize: 26,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF0eaa42),
-                    ),
-                  ),
-                  SizedBox(width: 5),
-                  Icon(
+                  isLoading
+                      ? const CircularProgressIndicator() // Show loading indicator while fetching
+                      : Text(
+                          averageCigarettes?.toString() ?? '0', // Display the average or '0' if null
+                          style: const TextStyle(
+                            fontSize: 26,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF0eaa42),
+                          ),
+                        ),
+                  const SizedBox(width: 5),
+                  const Icon(
                     Icons.smoking_rooms,
                     color: Color(0xFF0eaa42),
                     size: 26,
@@ -199,6 +220,7 @@ class _CigaretteBarChartState extends State<CigaretteBarChart> {
     );
   }
 }
+
 
 // import 'package:breathair_app/pages/services/averageService.dart'; // Import AverageService
 // import 'package:fl_chart/fl_chart.dart';

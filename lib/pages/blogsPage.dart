@@ -5,14 +5,13 @@ import 'package:flutter/material.dart';
 
 class Blogspage extends StatefulWidget {
   const Blogspage({super.key});
-  
 
   @override
   State<Blogspage> createState() => _BlogspageState();
 }
 
 class _BlogspageState extends State<Blogspage> {
-    final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
@@ -89,6 +88,80 @@ class _BlogspageState extends State<Blogspage> {
                   ],
                 ),
               ),
+              const SizedBox(height: 8),
+
+              SingleChildScrollView(
+                  child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    const Text(
+                      'Popular Blogs',
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 8),
+                  ],
+                ),
+              )),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    BlogCard(
+                        category: 'Nutrition',
+                        title: 'Learn more about apples!',
+                        votes: 78,
+                        imageUrl:
+                            'https://images.unsplash.com/photo-1485527172732-c00ba1bf8929?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxjb2xsZWN0aW9uLXBhZ2V8MTV8NDAxMzg3NTd8fGVufDB8fHx8fA%3D%3D'),
+                    const SizedBox(width: 12),
+                    BlogCard(
+                        category: 'Lifestyle',
+                        title: 'The secrets of maximizing your productivity',
+                        votes: 54,
+                        imageUrl:
+                            'https://plus.unsplash.com/premium_photo-1682310140123-d479f37e2c88?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8cHJvZHVjdGl2aXRlfGVufDB8fDB8fHww'),
+                    // Add more BlogCards as needed
+                  ],
+                ),
+              ),
+              const SizedBox(height: 8),
+
+              SingleChildScrollView(
+                  child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    const Text(
+                      'Collection',
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 8),
+                  ],
+                ),
+              )),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    BlogCard(
+                        category: 'Nutrition',
+                        title: 'Learn more about apples!',
+                        votes: 78,
+                        imageUrl:
+                            'https://images.unsplash.com/photo-1485527172732-c00ba1bf8929?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxjb2xsZWN0aW9uLXBhZ2V8MTV8NDAxMzg3NTd8fGVufDB8fHx8fA%3D%3D'),
+                    const SizedBox(width: 12),
+                    BlogCard(
+                        category: 'Lifestyle',
+                        title: 'The secrets of maximizing your productivity',
+                        votes: 54,
+                        imageUrl:
+                            'https://plus.unsplash.com/premium_photo-1682310140123-d479f37e2c88?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8cHJvZHVjdGl2aXRlfGVufDB8fDB8fHww'),
+                    // Add more BlogCards as needed
+                  ],
+                ),
+              ),
             ],
           ),
         ),
@@ -107,11 +180,11 @@ class _BlogspageState extends State<Blogspage> {
           padding: const EdgeInsets.all(8.0),
           decoration: BoxDecoration(
             color: const Color(0xFFf2fdef),
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(12),
           ),
           child: Image.asset(
             iconPath,
-            height: 50,
+            height: 80,
           ),
         ),
         const SizedBox(height: 4),
@@ -125,6 +198,5 @@ class _BlogspageState extends State<Blogspage> {
         ),
       ],
     );
-    
   }
 }

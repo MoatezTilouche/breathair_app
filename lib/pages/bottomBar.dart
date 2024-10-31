@@ -1,5 +1,8 @@
 import 'package:breathair_app/pages/blogsPage.dart';
+import 'package:breathair_app/pages/home.dart';
 import 'package:breathair_app/pages/login.dart';
+import 'package:breathair_app/pages/moneyChart.dart';
+import 'package:breathair_app/pages/moneyStatsPage.dart';
 import 'package:flutter/material.dart';
 
 class DemoBottomAppBar extends StatefulWidget {
@@ -44,7 +47,7 @@ class _DemoBottomAppBarState extends State<DemoBottomAppBar> {
               index: 0,
               icon: const ImageIcon(AssetImage("assets/home.png")),
               text: 'Home',
-              navigateTo: const Login(),
+              navigateTo: const Home(),
             ),
             // Spacer to add space between icons
             const Spacer(),
@@ -55,7 +58,6 @@ class _DemoBottomAppBarState extends State<DemoBottomAppBar> {
               navigateTo: const Login(),
             ),
             const Spacer(),
-            // Third Tab
             _buildTabItem(
               index: 2,
               icon: const ImageIcon(AssetImage("assets/livre.png")),
@@ -68,7 +70,7 @@ class _DemoBottomAppBarState extends State<DemoBottomAppBar> {
               index: 3,
               icon: const Icon(Icons.people),
               text: 'Comunity',
-              navigateTo: const Login(),
+              navigateTo: const StepsPage(),
             ),
             const Spacer(),
             _buildTabItem(
