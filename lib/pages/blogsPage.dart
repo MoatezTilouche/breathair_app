@@ -1,15 +1,19 @@
 import 'package:breathair_app/pages/appBar.dart';
 import 'package:breathair_app/pages/blogCard.dart';
+import 'package:breathair_app/pages/bottomBar.dart';
 import 'package:flutter/material.dart';
 
 class Blogspage extends StatefulWidget {
   const Blogspage({super.key});
+  
 
   @override
   State<Blogspage> createState() => _BlogspageState();
 }
 
 class _BlogspageState extends State<Blogspage> {
+    final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -89,6 +93,8 @@ class _BlogspageState extends State<Blogspage> {
           ),
         ),
       ),
+      bottomNavigationBar:
+          DemoBottomAppBar(scaffoldKey: _scaffoldKey, selectedIndex: 2),
     );
   }
 
@@ -119,5 +125,6 @@ class _BlogspageState extends State<Blogspage> {
         ),
       ],
     );
+    
   }
 }
