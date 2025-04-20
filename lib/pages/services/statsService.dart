@@ -103,4 +103,59 @@ class CigaretteService {
 
     return timebtwcig;
   }
+
+  Future<Map<String, dynamic>> updateCigaretteStatsAndIncrement(String userId) async {
+    AuthService authService = AuthService();
+    String? token = await authService.getToken();
+
+    if (token == null) {
+      throw Exception('Token not found');
+    }
+
+    // Send PATCH request to update cigarette stats and increment total cigarettes
+    final response = await http.patch(
+      Uri.parse('$baseUrl/users/$userId/update-cigarette-stats'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to update cigarette stats and increment total cigarettes');
+    }
+
+    var responseData = json.decode(response.body);
+    return responseData;
+  }
+
+  // New method to predict smoking time
+  Future<Map<String, dynamic>> predictSmokingTime(String userId) async {
+    AuthService authService = AuthService();
+    String? token = await authService.getToken();
+
+    if (token == null) {
+      throw Exception('Token not found');
+    }
+
+    // Send GET request to predict smoking time
+    final response = await http.get(
+      Uri.parse('$baseUrl/users/$userId/predict-smoking'),
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to predict smoking time');
+    }
+
+    var responseData = json.decode(response.body);
+    
+    if (!responseData['success']) {
+      throw Exception('Prediction failed: ${responseData['message']}');
+    }
+
+    return responseData['data']; // Return prediction data
+  }
 }

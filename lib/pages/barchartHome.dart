@@ -12,7 +12,7 @@ class CigaretteBarChart extends StatefulWidget {
 
 class _CigaretteBarChartState extends State<CigaretteBarChart> {
   late Future<List<Map<String, double>>> _challengeData;
-  int? averageCigarettes; // Variable to hold the average
+  double? averageCigarettes; // Variable to hold the average
   bool isLoading = true;
 
   @override
@@ -25,9 +25,9 @@ class _CigaretteBarChartState extends State<CigaretteBarChart> {
   Future<void> _fetchAverageCigarettes() async {
     AverageService averageService = AverageService();
     try {
-      int average = await averageService.fetchAverage();
+      double average = await averageService.fetchAverage();
       setState(() {
-        averageCigarettes = average; // Update the average
+        averageCigarettes = average.toDouble(); // Update the average
         isLoading = false; // Stop loading
       });
     } catch (e) {
@@ -63,7 +63,8 @@ class _CigaretteBarChartState extends State<CigaretteBarChart> {
                   isLoading
                       ? const CircularProgressIndicator() // Show loading indicator while fetching
                       : Text(
-                          averageCigarettes?.toString() ?? '0', // Display the average or '0' if null
+                          averageCigarettes?.toString() ??
+                              '0', // Display the average or '0' if null
                           style: const TextStyle(
                             fontSize: 26,
                             fontWeight: FontWeight.bold,
@@ -112,6 +113,7 @@ class _CigaretteBarChartState extends State<CigaretteBarChart> {
             }
 
             List<Map<String, double>> challengeData = snapshot.data!;
+            print(challengeData);
             return AspectRatio(
               aspectRatio: 1.6,
               child: BarChart(

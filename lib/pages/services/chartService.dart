@@ -56,9 +56,8 @@ class ChartService {
           List<Map<String, dynamic>>.from(json.decode(chartResponse.body));
 
       // Create a list of maps with `x` and `y` values
-      List<Map<String, double>> challengeData = challenges.map((challenge) {
+      List<Map<String, double>> challengeData = challenges.where((challenge) {
         final dateStr = challenge['dateactuel'];
-        final double nbcigsmoked = (challenge['nbexpeccig'] ?? 0).toDouble();
 
         // Check if dateStr is valid before parsing
         DateTime dateactuel;
@@ -68,6 +67,21 @@ class ChartService {
           throw Exception('Invalid date format: $dateStr');
         }
 
+        // Get the start and end of the current week
+        final now = DateTime.now();
+        final startOfWeek =
+            now.subtract(Duration(days: now.weekday - 1)); // Monday
+        final endOfWeek = startOfWeek.add(Duration(days: 6)); // Sunday
+
+        // Check if dateactuel is within the current week
+        return dateactuel.isAfter(startOfWeek) &&
+            dateactuel.isBefore(endOfWeek.add(Duration(days: 1)));
+      }).map((challenge) {
+        final dateStr = challenge['dateactuel'];
+        final double nbcigsmoked = (challenge['nbexpeccig'] ?? 0).toDouble();
+
+        // Parse the date again after filtering
+        final dateactuel = DateTime.parse(dateStr);
         final int weekday = dateactuel.weekday - 1; // Monday=0, ..., Sunday=6
 
         return {

@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 class AverageService {
   final String baseUrl = 'http://localhost:3000';
 
-  Future<int> fetchAverage() async {
+  Future<double> fetchAverage() async {
     try {
       AuthService authService = AuthService();
       String? token = await authService.getToken();
@@ -46,7 +46,7 @@ class AverageService {
       );
 
       if (averageResponse.statusCode == 200) {
-        return json.decode(averageResponse.body) as int;
+        return json.decode(averageResponse.body) as double;
       } else {
         throw Exception(
             'Failed to fetch average cigarettes: ${averageResponse.body}');

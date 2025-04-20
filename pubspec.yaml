@@ -45,6 +45,9 @@ dependencies:
   flutter_timer_countdown: ^1.0.7
   fl_chart: ^0.69.0
   flutter_secure_storage: ^5.0.2
+  flutter_local_notifications: ^16.3.2  # Use the latest version
+  noise_meter: ^3.0.0
+
 
 
 

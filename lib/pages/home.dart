@@ -1,16 +1,19 @@
 import 'dart:convert';
 import 'dart:math';
+import 'package:breathair_app/constants.dart';
+import 'package:breathair_app/pages/BlowGamePage%20.dart';
 import 'package:breathair_app/pages/appBar.dart';
 import 'package:breathair_app/pages/barchartHome.dart';
 import 'package:breathair_app/pages/blogCard.dart';
 import 'package:breathair_app/pages/bottomBar.dart';
-import 'package:breathair_app/pages/services/authService.dart';
 import 'package:breathair_app/pages/services/statsService.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_timer_countdown/flutter_timer_countdown.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:async'; // Added for Timer
+
+// Import the BlowGamePage
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -24,16 +27,38 @@ class _HomeState extends State<Home> {
 
   String quote = '';
   String author = '';
+  String nextCigaretteTime = ''; // Variable to store next cigarette time
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   int timebtwcig = 0;
   int compteurCig = 0;
+  Timer? _timeCheckTimer; // Timer to check system time
 
   @override
   void initState() {
     super.initState();
     fetchRandomQuote();
     fetchCigaretteCount();
+    fetchNextCigarettePrediction(); // Fetch the next cigarette prediction
+    _startTimeCheck(); // Start checking the time
+  }
+
+  // Function to periodically check if the current time matches nextCigaretteTime
+  void _startTimeCheck() {
+    _timeCheckTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (nextCigaretteTime.isNotEmpty) {
+        final currentTime = DateFormat.Hm().format(DateTime.now());
+        if (currentTime == nextCigaretteTime) {
+          // Navigate to BlowGamePage
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => BlowGamePage()),
+          );
+          // Optionally stop the timer to prevent multiple triggers
+          _timeCheckTimer?.cancel();
+        }
+      }
+    });
   }
 
   Future<void> fetchRandomQuote() async {
@@ -64,10 +89,44 @@ class _HomeState extends State<Home> {
       setState(() {
         compteurCig = fetchedCompteurCig;
         timebtwcig = fetchedTimeBtwCig;
+        compt_cig = compteurCig;
+        print(compt_cig);
       });
     } catch (error) {
       print('Error fetching cigarette data: $error');
     }
+  }
+
+  // Fetch the next cigarette prediction time
+  Future<void> fetchNextCigarettePrediction() async {
+    try {
+      final response = await http
+          .get(Uri.parse('http://localhost:3000/smoking/predict-next'));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final prediction = data['prediction'];
+
+        // Parse and format the time from the prediction
+        final dateTime = DateTime.parse(prediction);
+        final formattedTime =
+            DateFormat.Hm().format(dateTime); // Format time as "HH:mm"
+
+        setState(() {
+          nextCigaretteTime = formattedTime;
+        });
+      } else {
+        throw Exception('Failed to load prediction');
+      }
+    } catch (error) {
+      print('Error fetching next cigarette prediction: $error');
+    }
+  }
+
+  @override
+  void dispose() {
+    _timeCheckTimer?.cancel(); // Cancel the timer when disposing
+    super.dispose();
   }
 
   @override
@@ -178,10 +237,11 @@ class _HomeState extends State<Home> {
                     ),
                     const SizedBox(height: 26),
 
-                    // Highlights cards
+                    // Highlights cards with equal size
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
+                        // First Box (Cigarette count)
                         Expanded(
                           child: Container(
                             padding: const EdgeInsets.all(16),
@@ -205,7 +265,7 @@ class _HomeState extends State<Home> {
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
-                                  '$compteurCig',
+                                  '$compt_cig',
                                   style: const TextStyle(
                                       fontSize: 25,
                                       fontWeight: FontWeight.bold,
@@ -222,6 +282,7 @@ class _HomeState extends State<Home> {
                           ),
                         ),
                         const SizedBox(width: 12),
+                        // Second Box (Next Cigarette time)
                         Expanded(
                           child: Container(
                             padding: const EdgeInsets.all(16),
@@ -234,15 +295,15 @@ class _HomeState extends State<Home> {
                                 const Icon(Icons.access_time,
                                     size: 30, color: Colors.white),
                                 const SizedBox(height: 8),
-                                timebtwcig > 0
-                                    ? TimerCountdown(
-                                        format:
-                                            CountDownTimerFormat.hoursMinutes,
-                                        endTime: DateTime.now()
-                                            .add(Duration(minutes: timebtwcig)),
-                                        onEnd: () {
-                                          print("Timer finished");
-                                        },
+                                nextCigaretteTime.isNotEmpty
+                                    ? Text(
+                                        'Next Cigarette at $nextCigaretteTime',
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
                                       )
                                     : const Text(
                                         'Loading time...',
@@ -250,22 +311,7 @@ class _HomeState extends State<Home> {
                                             fontSize: 14,
                                             color: Colors.white70),
                                       ),
-                                const SizedBox(height: 8),
-                                const Text(
-                                  'Next Cigarette ',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                const Text(
-                                  'Time remaining',
-                                  style: TextStyle(
-                                      fontSize: 14, color: Colors.white70),
-                                ),
+                                const SizedBox(height: 83),
                               ],
                             ),
                           ),
@@ -302,7 +348,7 @@ class _HomeState extends State<Home> {
                                 'Smoking has an effect in harming your lungs',
                             votes: 78,
                             imageUrl:
-                                'https://images.unsplash.com/photo-1593974123009-e87a2188ae12?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8c21va2luZyUyMGtpbGxzfGVufDB8fDB8fHww',
+                                'https://images.unsplash.com/photo-1566159549726-435f258cf4e7?w=400&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1yZWxhdGVkfDF8fHxlbnwwfHx8fHww',
                           ),
                           const SizedBox(width: 12),
                           BlogCard(
@@ -311,7 +357,7 @@ class _HomeState extends State<Home> {
                                 'The secrets of maximizing your productivity',
                             votes: 54,
                             imageUrl:
-                                'https://images.unsplash.com/photo-1566159549726-435f258cf4e7?w=400&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1yZWxhdGVkfDF8fHxlbnwwfHx8fHw%3D',
+                                'https://images.unsplash.com/photo-1593974123009-e87a2188ae12?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8c21va2luZyUyMGtpbGxzfGVufDB8fDB8fHww',
                           ),
                         ],
                       ),
